@@ -1,11 +1,9 @@
 name: Nova OS Smoke Test
-
 on:
   push:
-    branches: [nova-ai-os]
+    branches: [main]
   pull_request:
     branches: [main]
-
 jobs:
   syntax:
     runs-on: ubuntu-latest
@@ -17,5 +15,5 @@ jobs:
       - name: Check Netlify functions
         run: |
           for f in netlify/functions/*.js; do node --check "$f"; done
-      - name: Check Nova OS app script
+      - name: Check Nova OS app
         run: node --check nova-os/app.js
