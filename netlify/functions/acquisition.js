@@ -57,7 +57,7 @@ async function runAcquisition(trigger, ownerCommand = '') {
     if (lead && p.outreach_draft?.body) {
       const approval = (await supabaseRequest('approvals', {
         method: 'POST', headers: { Prefer: 'return=representation' },
-        body: JSON.stringify({ organization_id: org.id, lead_id: lead.id, risk: 'MEDIUM', action: 'OUTBOUND_CONTACT_DRAFT', payload: { channel: 'EMAIL', company_id: company.id, subject: String(p.outreach_draft.subject || '').slice(0,240), body: String(p.outreach_draft.body || '').slice(0,6000), source_url: p.source_url || null, reason: p.reason || null }, status: 'PENDING' })
+        body: JSON.stringify({ organization_id: org.id, risk: 'MEDIUM', action: 'OUTBOUND_CONTACT_DRAFT', payload: { lead_id: lead.id, channel: 'EMAIL', company_id: company.id, subject: String(p.outreach_draft.subject || '').slice(0,240), body: String(p.outreach_draft.body || '').slice(0,6000), source_url: p.source_url || null, reason: p.reason || null }, status: 'PENDING' })
       }))?.[0];
       drafts.push(approval);
     }
