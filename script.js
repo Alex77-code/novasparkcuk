@@ -1,39 +1,106 @@
-const WA='447449793617';
-const polish=document.createElement('style');polish.textContent=`.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1)}.cap-grid article{min-height:240px;padding:30px;background:#0b1a30;transition:transform .3s,background .3s}.cap-grid article:hover{transform:translateY(-5px);background:#102543}.cap-grid article>span{font:700 10px 'Manrope';color:#7ea7d7;letter-spacing:.12em}.cap-grid h3{font-size:22px;margin:55px 0 12px;letter-spacing:-.03em}.cap-grid p{font-size:12px;line-height:1.75;color:#9caec6}.summary{border:1px solid #e0e7ef;background:#f7f9fc;border-radius:18px;padding:20px;color:#26354b}.summary-grid{display:grid;grid-template-columns:110px 1fr;gap:10px 14px;margin-top:16px;font-size:12px}.summary-grid span{color:#8190a4}.summary-grid strong{font-weight:700}.success-note{margin-top:15px;padding:14px;border-radius:14px;background:#eef8f3;color:#287453;font-size:11px;line-height:1.6}.options button.selected{border-color:#0b3f82;background:#eef5ff;color:#0b3f82;box-shadow:0 0 0 2px rgba(11,63,130,.08)}@media(max-width:900px){.cap-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.cap-grid{grid-template-columns:1fr}.cap-grid article{min-height:190px}.cap-grid h3{margin:30px 0 10px}.widget{right:10px;bottom:10px;width:calc(100% - 20px);max-height:calc(100vh - 20px);padding:24px 18px;border-radius:24px}.widget-head h2{font-size:25px}.options{grid-template-columns:1fr!important}.fields{grid-template-columns:1fr!important}.fields .full{grid-column:auto!important}.widget-actions{gap:8px}.error{font-size:10px;text-align:center}.project-float b{display:none}.project-float{left:12px;bottom:12px;padding:10px}.wa-float{right:12px;bottom:12px;padding:10px 12px}.wa-float b{font-size:9px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}`;document.head.appendChild(polish);
-const luxury=document.createElement('style');luxury.textContent=`:root{--blue:#1677c8;--blue2:#55b8f2;--gold:#9ecff2;--ink:#10243b;--paper:#f7fbff;--line:#dbeaf6;--dark:#071a2d}body{background:#fff;color:#10243b}.announcement{background:linear-gradient(90deg,#071a2d,#0b3d67,#071a2d);border-bottom:1px solid rgba(111,205,255,.35)}.header{background:rgba(255,255,255,.88);border-bottom:1px solid rgba(22,119,200,.12);box-shadow:0 8px 30px rgba(15,83,135,.05)}.navcta{background:linear-gradient(135deg,#0c3152,#168bd2);border:1px solid rgba(140,218,255,.65);box-shadow:0 10px 30px rgba(22,119,200,.16)}.hero{background:radial-gradient(circle at 78% 18%,rgba(92,198,255,.28),transparent 22%),radial-gradient(circle at 18% 55%,rgba(28,137,215,.10),transparent 32%),linear-gradient(180deg,#fff 0%,#f5fbff 62%,#eaf7ff 100%)}h1{color:#09223b}h1 em,h2 em{color:#1785cf}.kicker,.eyebrow{color:#1472b7}.kicker{border-color:rgba(68,170,231,.35);background:rgba(255,255,255,.78);box-shadow:0 8px 30px rgba(37,140,205,.08)}.kicker span{background:#53c2f5;box-shadow:0 0 0 5px rgba(83,194,245,.15)}.hero-copy>p{color:#58718a}.primary{background:linear-gradient(135deg,#0a3152,#168bd3);box-shadow:0 14px 35px rgba(18,119,200,.15)}.secondary{border-color:#b9d9ed;background:#fff;color:#164b70}.hero-art:before{content:'';position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(85,193,245,.24),rgba(85,193,245,0) 68%);filter:blur(8px);animation:luxPulse 6s ease-in-out infinite}.art-glow{background:rgba(73,192,246,.20);filter:blur(38px);animation:luxPulse 7s ease-in-out infinite}.orbital{border-color:rgba(61,169,226,.30);animation:orbitFloat 9s ease-in-out infinite}.o2{animation-delay:-3s}.panel{background:linear-gradient(145deg,#06192b,#0e4773 65%,#0b6da8);border:1px solid rgba(133,220,255,.28);box-shadow:0 45px 110px rgba(7,72,117,.24)}.panel:after{background:#48b9ef}.panel-title strong{color:#8edaff}.bars span{background:linear-gradient(180deg,#8fddff,#1b79b6)}.tag{background:rgba(255,255,255,.96);border-color:#b8dced;box-shadow:0 18px 50px rgba(16,104,160,.15)}.hero-strip{border-color:#d8edf9}.hero-strip>div{color:#18577f}.section{background:#fff}.services{background:linear-gradient(180deg,#f6fbff,#eaf6fd)}.service-grid{border-color:#d5e8f4}.service{background:rgba(255,255,255,.88);border-color:#d5e8f4;box-shadow:0 5px 20px rgba(25,113,165,.03)}.service:hover{box-shadow:0 28px 65px rgba(18,119,200,.13);border-color:#a7d7ef}.service.featured{background:linear-gradient(145deg,#08233b,#0d5d8f)}.service-symbol,.featured .service-symbol{color:#55c8f6}.service button{color:#1475b7}.featured button{color:#fff}.dark{background:linear-gradient(145deg,#06182b,#0a3556);position:relative;overflow:hidden}.dark:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 15%,rgba(77,197,250,.18),transparent 30%);pointer-events:none}.cap-grid{background:rgba(124,211,247,.18);border-color:rgba(124,211,247,.18)}.cap-grid article{background:rgba(6,27,45,.96)}.cap-grid article:hover{background:#0b4168}.cap-grid article>span{color:#74cef5}.process{background:linear-gradient(180deg,#fff,#f5fbff)}.process-grid{border-color:#d5e8f4}.process-grid article{background:#fff;border-color:#d5e8f4}.process-grid b{color:#1785cf}.industries{background:linear-gradient(180deg,#eef9ff,#f8fcff)}.chips span{background:#fff;border-color:#cce4f2;box-shadow:0 7px 20px rgba(24,119,176,.04)}.cta{background:#eef9ff}.cta-box{background:linear-gradient(135deg,#061a2d,#0b5c8d 62%,#1597d4);border-color:rgba(127,220,255,.45);box-shadow:0 35px 90px rgba(13,103,157,.17)}.white{border-color:#b7e3f8;color:#0b5b89}.contact{background:#fff}.contact-links{border-color:#d5e8f4}.contact-links a{border-color:#d5e8f4}.contact-links span{color:#1785cf}.contact-card{background:linear-gradient(145deg,#f2faff,#fff);border-color:#cfe6f3;box-shadow:0 25px 60px rgba(16,105,160,.08)}.contact-card .card-top i{color:#1785cf}footer{background:linear-gradient(145deg,#051525,#092f4d);border-top-color:rgba(93,205,249,.28)}.footer-grid h4{color:#75c9f2}.footer-grid a:hover{color:#83d8ff}.footer-bottom{border-color:rgba(115,207,244,.18)}.wa-float{background:linear-gradient(135deg,#159b72,#0c7b5a);box-shadow:0 18px 45px rgba(13,125,91,.22)}.project-float{background:#fff;color:#0c6aa2;border-color:#b9dff1;box-shadow:0 18px 50px rgba(18,111,166,.15)}.project-float span{background:linear-gradient(135deg,#0c3152,#168bd3)}.backdrop{background:rgba(4,28,50,.60)}.widget{border-color:#cbe6f5;box-shadow:0 40px 120px rgba(4,55,87,.28)}.widget-progress{background:#e6f3fa}.widget-progress span{background:linear-gradient(90deg,#55c8f6,#1685cf)}.options button:hover,.options button.selected{border-color:#66c5ef;background:#effaff;color:#09689f;box-shadow:0 0 0 2px rgba(76,192,241,.10)}.fields input:focus,.fields textarea:focus{border-color:#58bce9;box-shadow:0 0 0 3px rgba(88,188,233,.13)}.summary{background:#f0f9ff;border-color:#c9e5f4}.next{background:linear-gradient(135deg,#0a3152,#168bd3);box-shadow:0 12px 30px rgba(22,139,211,.16)}
-/* Scroll-reveal system: sections and cards elegantly enter as the visitor moves down the page. */
-.reveal-on-scroll,.service,.cap-grid article,.process-grid article,.contact-card,.chips span,.section-top,.split,.industry-layout,.cta-box,.contact-links a{opacity:0;transform:translateY(34px) scale(.985);filter:blur(3px);transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1),filter .85s cubic-bezier(.16,1,.3,1)}.reveal-on-scroll.seen,.service.seen,.cap-grid article.seen,.process-grid article.seen,.contact-card.seen,.chips span.seen,.section-top.seen,.split.seen,.industry-layout.seen,.cta-box.seen,.contact-links a.seen{opacity:1;transform:none;filter:none}.service:nth-child(2),.cap-grid article:nth-child(2),.process-grid article:nth-child(2){transition-delay:.08s}.service:nth-child(3),.cap-grid article:nth-child(3),.process-grid article:nth-child(3){transition-delay:.16s}.service:nth-child(4),.cap-grid article:nth-child(4),.process-grid article:nth-child(4){transition-delay:.24s}.chips span{transition-duration:.7s}.chips span:nth-child(2n){transition-delay:.06s}.chips span:nth-child(3n){transition-delay:.12s}@keyframes luxPulse{0%,100%{transform:scale(.96);opacity:.72}50%{transform:scale(1.05);opacity:1}}@keyframes orbitFloat{0%,100%{transform:rotate(-18deg) translateY(0)}50%{transform:rotate(-12deg) translateY(-12px)}}
-@media(max-width:620px){.hero-art:before{width:330px;height:330px}.section-top,.split,.industry-layout,.cta-box,.contact-card,.contact-links a{transform:translateY(24px)}.service,.cap-grid article,.process-grid article{transform:translateY(24px) scale(.99)}}
-@media(prefers-reduced-motion:reduce){.reveal-on-scroll,.service,.cap-grid article,.process-grid article,.contact-card,.chips span,.section-top,.split,.industry-layout,.cta-box,.contact-links a{opacity:1!important;transform:none!important;filter:none!important}.art-glow,.hero-art:before,.orbital{animation:none!important}}`;document.head.appendChild(luxury);
-const modal=document.getElementById('modal');
-const nav=document.getElementById('navlinks');
-const hamb=document.getElementById('hamb');
-const steps=[...document.querySelectorAll('.step')];
-const progress=document.getElementById('progress');
-const stepLabel=document.getElementById('stepLabel');
-const title=document.getElementById('widgetTitle');
-const sub=document.getElementById('widgetSub');
-const next=document.getElementById('next');
-const back=document.getElementById('back');
-const error=document.getElementById('error');
-const summary=document.getElementById('summary');
-let current=1;
-const state={services:new Set(),goal:'',budget:''};
-function openModal(service=''){modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';current=1;if(service){const b=[...document.querySelectorAll('#servicesOptions button')].find(x=>x.dataset.v===service);if(b){state.services.add(service);b.classList.add('selected');}}update();}
+const WA = '447449793617';
+
+const style = document.createElement('style');
+style.textContent = `
+  :root { --motion-blue:#168bd3; --motion-sky:#6bd5ff; }
+  body::before{content:'';position:fixed;left:0;top:0;width:100%;height:3px;z-index:9999;transform-origin:left;transform:scaleX(var(--scroll-progress,0));background:linear-gradient(90deg,var(--motion-sky),var(--motion-blue),#b8efff);box-shadow:0 0 18px rgba(80,200,250,.45);pointer-events:none}
+  .service,.cap-grid article,.process-grid article,.contact-card,.chips span,.section-top,.split,.industry-layout,.cta-box,.contact-links a{opacity:0;transform:translateY(34px) scale(.985);filter:blur(3px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1),filter .8s cubic-bezier(.16,1,.3,1)}
+  .service.seen,.cap-grid article.seen,.process-grid article.seen,.contact-card.seen,.chips span.seen,.section-top.seen,.split.seen,.industry-layout.seen,.cta-box.seen,.contact-links a.seen{opacity:1;transform:none;filter:none}
+  .service:nth-child(2),.cap-grid article:nth-child(2),.process-grid article:nth-child(2){transition-delay:.08s}.service:nth-child(3),.cap-grid article:nth-child(3),.process-grid article:nth-child(3){transition-delay:.16s}.service:nth-child(4),.cap-grid article:nth-child(4),.process-grid article:nth-child(4){transition-delay:.24s}
+  .chips span{transition-duration:.65s}.chips span:nth-child(2n){transition-delay:.06s}.chips span:nth-child(3n){transition-delay:.12s}
+  .service{will-change:transform}.service::after{content:'↗';position:absolute;right:22px;top:24px;color:#69d2fb;font-size:18px;opacity:.18;transform:translate(5px,-5px);transition:.3s}.service:hover::after{opacity:1;transform:none}
+  .cap-grid article{position:relative;overflow:hidden}.cap-grid article::after{content:'';position:absolute;width:170px;height:170px;right:-90px;bottom:-90px;border-radius:50%;background:radial-gradient(circle,rgba(83,201,249,.28),transparent 68%);transition:.5s}.cap-grid article:hover::after{transform:scale(1.7)}
+  .chips span:hover{transform:translateY(-4px);border-color:#76caef;box-shadow:0 15px 30px rgba(27,130,190,.1)}
+  .hero-copy,.hero-art{will-change:transform}.hero-art .panel{will-change:transform}
+  @keyframes novaPulse{0%,100%{transform:scale(.97);opacity:.72}50%{transform:scale(1.05);opacity:1}}
+  .hero-art::before{animation:novaPulse 7s ease-in-out infinite}
+  @media(prefers-reduced-motion:reduce){body::before{display:none}.service,.cap-grid article,.process-grid article,.contact-card,.chips span,.section-top,.split,.industry-layout,.cta-box,.contact-links a{opacity:1!important;transform:none!important;filter:none!important}.hero-copy,.hero-art{transform:none!important}.hero-art::before{animation:none!important}}
+`;
+document.head.appendChild(style);
+
+const modal = document.getElementById('modal');
+const nav = document.getElementById('navlinks');
+const hamb = document.getElementById('hamb');
+const steps = [...document.querySelectorAll('.step')];
+const progress = document.getElementById('progress');
+const stepLabel = document.getElementById('stepLabel');
+const title = document.getElementById('widgetTitle');
+const sub = document.getElementById('widgetSub');
+const next = document.getElementById('next');
+const back = document.getElementById('back');
+const error = document.getElementById('error');
+const summary = document.getElementById('summary');
+let current = 1;
+const state = { services:new Set(), goal:'', budget:'' };
+
+function openModal(service=''){
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  current=1;
+  if(service){const b=[...document.querySelectorAll('#servicesOptions button')].find(x=>x.dataset.v===service);if(b){state.services.add(service);b.classList.add('selected');}}
+  update();
+}
 function closeModal(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
 document.querySelectorAll('.open-widget').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.service||'')));
 document.querySelectorAll('[data-service]').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.service)));
 document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',closeModal));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal();});
 if(hamb){hamb.addEventListener('click',()=>{const open=nav.classList.toggle('open');hamb.setAttribute('aria-expanded',String(open));});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));}
-function wireMulti(id,key){document.querySelectorAll(`#${id} button`).forEach(b=>b.addEventListener('click',()=>{if(state[key].has(b.dataset.v)){state[key].delete(b.dataset.v);b.classList.remove('selected');}else{state[key].add(b.dataset.v);b.classList.add('selected');}error.textContent='';}));}
+
+function wireMulti(id,key){document.querySelectorAll(`#${id} button`).forEach(b=>b.addEventListener('click',()=>{if(state[key].has(b.dataset.v)){state[key].delete(b.dataset.v);b.classList.remove('selected')}else{state[key].add(b.dataset.v);b.classList.add('selected')}error.textContent='';}));}
 function wireSingle(id,key){document.querySelectorAll(`#${id} button`).forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll(`#${id} button`).forEach(x=>x.classList.remove('selected'));state[key]=b.dataset.v;b.classList.add('selected');error.textContent='';}));}
 wireMulti('servicesOptions','services');wireSingle('goalOptions','goal');wireSingle('budgetOptions','budget');
-function update(){steps.forEach(s=>s.classList.toggle('active',Number(s.dataset.step)===current));progress.style.width=`${current*20}%`;stepLabel.textContent=`STEP ${current} OF 5`;const meta=[['What can we help you with?','Select one or more services.'],['What is your main goal?','Choose the outcome that matters most.'],['Tell us about your business','A few details help us make the conversation useful.'],['What level of investment are you considering?','Choose the closest project budget.'],['Your enquiry is ready','Review your details before opening WhatsApp.']][current-1];title.textContent=meta[0];sub.textContent=meta[1];back.style.visibility=current===1?'hidden':'visible';next.textContent=current===5?'Continue to WhatsApp →':'Continue →';error.textContent='';if(current===5)updateSummary();}
-function updateSummary(){const val=id=>document.getElementById(id)?.value.trim()||'Not provided';summary.innerHTML=`<b>Enquiry summary</b><div class="summary-grid"><span>Services</span><strong>${[...state.services].join(', ')||'Not selected'}</strong><span>Main goal</span><strong>${state.goal||'Not selected'}</strong><span>Name</span><strong>${val('fName')}</strong><span>Business</span><strong>${val('fBusiness')}</strong><span>Email</span><strong>${val('fEmail')}</strong><span>Phone</span><strong>${val('fPhone')}</strong><span>Budget</span><strong>${state.budget||'Not selected'}</strong></div>`;}
-function validStep(){if(current===1&&!state.services.size){error.textContent='Please select at least one service.';return false;}if(current===2&&!state.goal){error.textContent='Please select your main goal.';return false;}if(current===3){for(const id of ['fName','fBusiness','fEmail','fPhone']){const el=document.getElementById(id);if(!el.value.trim()){error.textContent='Please complete the required fields.';el.focus();return false;}}const email=document.getElementById('fEmail');if(!email.checkValidity()){error.textContent='Please enter a valid email address.';email.focus();return false;}}if(current===4&&!state.budget){error.textContent='Please select a budget range.';return false;}return true;}
-next.addEventListener('click',()=>{if(!validStep())return;if(current<5){current++;update();if(current===5)updateSummary();}else sendWhatsApp();});
+
+function update(){
+  steps.forEach(s=>s.classList.toggle('active',Number(s.dataset.step)===current));
+  progress.style.width=`${current*20}%`;
+  stepLabel.textContent=`STEP ${current} OF 5`;
+  const meta=[['What can we help you with?','Select one or more services.'],['What is your main goal?','Choose the outcome that matters most.'],['Tell us about your business','A few details help us make the conversation useful.'],['What level of investment are you considering?','Choose the closest project budget.'],['Your enquiry is ready','Review your details before opening WhatsApp.']][current-1];
+  title.textContent=meta[0];sub.textContent=meta[1];back.style.visibility=current===1?'hidden':'visible';next.textContent=current===5?'Continue to WhatsApp →':'Continue →';error.textContent='';
+  if(current===5)updateSummary();
+}
+function updateSummary(){
+  const val=id=>document.getElementById(id)?.value.trim()||'Not provided';
+  summary.innerHTML=`<b>Enquiry summary</b><div class="summary-grid"><span>Services</span><strong>${[...state.services].join(', ')||'Not selected'}</strong><span>Main goal</span><strong>${state.goal||'Not selected'}</strong><span>Name</span><strong>${val('fName')}</strong><span>Business</span><strong>${val('fBusiness')}</strong><span>Email</span><strong>${val('fEmail')}</strong><span>Phone</span><strong>${val('fPhone')}</strong><span>Budget</span><strong>${state.budget||'Not selected'}</strong></div>`;
+}
+function validStep(){
+  if(current===1&&!state.services.size){error.textContent='Please select at least one service.';return false;}
+  if(current===2&&!state.goal){error.textContent='Please select your main goal.';return false;}
+  if(current===3){for(const id of ['fName','fBusiness','fEmail','fPhone']){const el=document.getElementById(id);if(!el.value.trim()){error.textContent='Please complete the required fields.';el.focus();return false;}}const email=document.getElementById('fEmail');if(!email.checkValidity()){error.textContent='Please enter a valid email address.';email.focus();return false;}}
+  if(current===4&&!state.budget){error.textContent='Please select a budget range.';return false;}
+  return true;
+}
+next.addEventListener('click',()=>{if(!validStep())return;if(current<5){current++;update();}else sendWhatsApp();});
 back.addEventListener('click',()=>{if(current>1){current--;update();}});
-function sendWhatsApp(){const v=id=>document.getElementById(id)?.value.trim()||'Not provided';const text=`Hello NovaSpark Creative Ltd,\n\nI'd like to discuss a digital marketing project.\n\nName: ${v('fName')}\nBusiness: ${v('fBusiness')}\nEmail: ${v('fEmail')}\nPhone / WhatsApp: ${v('fPhone')}\nWebsite: ${v('fWebsite')}\n\nServices:\n${[...state.services].map(x=>'• '+x).join('\n')}\n\nMain goal: ${state.goal}\n\nBudget: ${state.budget}\n\nProject details:\n${v('fMessage')}\n\nThank you.`;window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`,'_blank','noopener,noreferrer');}
-const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');io.unobserve(e.target);}}),{threshold:.1,rootMargin:'0px 0px -60px 0px'});
+function sendWhatsApp(){
+  const v=id=>document.getElementById(id)?.value.trim()||'Not provided';
+  const text=`Hello NovaSpark Creative Ltd,\n\nI'd like to discuss a digital marketing project.\n\nName: ${v('fName')}\nBusiness: ${v('fBusiness')}\nEmail: ${v('fEmail')}\nPhone / WhatsApp: ${v('fPhone')}\nWebsite: ${v('fWebsite')}\n\nServices:\n${[...state.services].map(x=>'• '+x).join('\n')}\n\nMain goal: ${state.goal}\n\nBudget: ${state.budget}\n\nProject details:\n${v('fMessage')}\n\nThank you.`;
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`,'_blank','noopener,noreferrer');
+}
+
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -70px 0px'});
 document.querySelectorAll('.service,.cap-grid article,.process-grid article,.contact-card,.chips span,.section-top,.split,.industry-layout,.cta-box,.contact-links a').forEach(x=>io.observe(x));
+
+function scrollEffects(){
+  const max=document.documentElement.scrollHeight-innerHeight;
+  document.body.style.setProperty('--scroll-progress',max>0?scrollY/max:0);
+}
+addEventListener('scroll',scrollEffects,{passive:true});scrollEffects();
+
+const heroCopy=document.querySelector('.hero-copy');
+const heroArt=document.querySelector('.hero-art');
+addEventListener('scroll',()=>{
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const y=Math.min(scrollY,650);
+  if(heroCopy)heroCopy.style.transform=`translate3d(0,${y*.055}px,0)`;
+  if(heroArt)heroArt.style.transform=`translate3d(0,${y*-.035}px,0)`;
+},{passive:true});
+
+const pointer=matchMedia('(pointer:fine)');
+if(pointer.matches){
+  document.querySelectorAll('.btn,.navcta,.project-float,.wa-float').forEach(el=>{
+    el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)*.08;const y=(e.clientY-r.top-r.height/2)*.08;el.style.transform=`translate(${x}px,${y}px)`;});
+    el.addEventListener('pointerleave',()=>{el.style.transform='';});
+  });
+}
