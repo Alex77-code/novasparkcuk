@@ -1,0 +1,43 @@
+name: NovaSpark CEO Autonomous Loop
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+concurrency:
+  group: novaspark-ceo-loop
+  cancel-in-progress: false
+
+jobs:
+  ceo-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run CEO financial intelligence
+        env:
+          URL: ${{ secrets.NOVA_CEO_FINANCIAL_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
+
+      - name: Run CEO decision engine
+        env:
+          URL: ${{ secrets.NOVA_CEO_DECISION_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
+
+      - name: Run prospecting and qualification
+        env:
+          PROSPECT_URL: ${{ secrets.NOVA_PROSPECTING_URL }}
+          QUALIFY_URL: ${{ secrets.NOVA_QUALIFICATION_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$PROSPECT_URL"; test -n "$QUALIFY_URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$PROSPECT_URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$QUALIFY_URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
