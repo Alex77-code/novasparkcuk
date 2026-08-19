@@ -1,2 +1,0 @@
-NovaSpark GitHub write-access test.
-This file is temporary and will be removed immediately.
