@@ -11,18 +11,17 @@ jobs:
     steps:
       - name: Trigger NOVA CEO execution loop
         env:
-          NOVA_AUTOPILOT_URL: ${{ secrets.NOVA_AUTOPILOT_URL }}
           NOVA_AUTOPILOT_SECRET: ${{ secrets.NOVA_AUTOPILOT_SECRET }}
         run: |
           set -euo pipefail
-          test -n "$NOVA_AUTOPILOT_URL"
+          URL='https://novasparkuk.netlify.app/.netlify/functions/ceo-autopilot'
           if [ -n "${NOVA_AUTOPILOT_SECRET:-}" ]; then
-            curl --fail-with-body --retry 2 -X POST "$NOVA_AUTOPILOT_URL" \
+            curl --fail-with-body --retry 2 -X POST "$URL" \
               -H 'content-type: application/json' \
               -H "authorization: Bearer $NOVA_AUTOPILOT_SECRET" \
               -d '{"trigger":"github_schedule"}'
           else
-            curl --fail-with-body --retry 2 -X POST "$NOVA_AUTOPILOT_URL" \
+            curl --fail-with-body --retry 2 -X POST "$URL" \
               -H 'content-type: application/json' \
               -d '{"trigger":"github_schedule"}'
           fi
