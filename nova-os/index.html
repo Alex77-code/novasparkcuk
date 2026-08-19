@@ -3,57 +3,30 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NovaSpark AI Command Center</title>
-<meta name="description" content="NovaSpark Creative Ltd AI Business Operating System">
+<meta name="description" content="NovaSpark Creative Ltd autonomous AI business operating system">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="auth" class="screen">
-  <div class="card auth-card">
-    <div class="brand"><span class="dot"></span>NOVASPARK AI</div>
-    <h1>CEO Command Center</h1>
-    <p>Owner access only. Real data only. No simulated business results.</p>
-    <form id="login-form">
-      <input id="email" type="email" autocomplete="username" placeholder="Owner email" required>
-      <input id="password" type="password" autocomplete="current-password" placeholder="Password" required>
-      <button>Sign in</button>
-    </form>
-    <div id="auth-status" class="status">Checking configuration…</div>
-  </div>
-</div>
+<div id="auth" class="screen"><div class="card auth-card"><div class="brand"><span class="brand-mark">✦</span> NOVASPARK</div><h1>AI Command Center</h1><p>Owner access only. Live business state. No simulated results.</p><form id="login-form"><input id="email" type="email" autocomplete="username" placeholder="Owner email" required><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button>Sign in to NOVA</button></form><div id="auth-status" class="status">Checking configuration…</div></div></div>
 <div id="app" hidden>
-  <header class="topbar">
-    <div class="brand"><span class="dot"></span>NOVA CEO</div>
-    <div class="top-actions"><span id="system-state" class="pill">SYSTEM CHECKING</span><button id="logout" class="ghost">Logout</button></div>
-  </header>
-  <aside class="sidebar">
-    <nav>
-      <a class="active">CEO</a><a>Revenue</a><a>Sales</a><a>Leads</a><a>CRM</a><a>Marketing</a><a>SEO</a><a>Content</a><a>Social</a><a>Ads</a><a>Clients</a><a>Projects</a><a>Tasks</a><a>Finance</a><a>Analytics</a><a>Agents</a><a>Automations</a><a>Approvals</a><a>Memory</a><a>Integrations</a><a>Security</a><a>Audit Logs</a>
-    </nav>
-  </aside>
-  <main class="main">
-    <section class="hero">
-      <div><p class="eyebrow">AUTONOMOUS BUSINESS OPERATING SYSTEM</p><h1>Good evening, Founder.</h1><p>Give NOVA CEO an objective. It converts the objective into measurable plans, projects, tasks and approvals.</p></div>
-      <button id="stop" class="danger">🛑 EMERGENCY STOP</button>
-    </section>
-    <section class="grid metrics">
-      <article><span>Revenue Today</span><strong id="m-revenue">—</strong><small>REAL DATA</small></article>
-      <article><span>Revenue Target</span><strong id="m-target">—</strong><small>FROM GOALS</small></article>
-      <article><span>Forecast</span><strong id="m-forecast">—</strong><small>CEO FORECAST</small></article>
-      <article><span>Pipeline</span><strong id="m-pipeline">—</strong><small>REAL DATA</small></article>
-      <article><span>New Leads</span><strong id="m-leads">—</strong><small>REAL DATA</small></article>
-      <article><span>Active Tasks</span><strong id="m-tasks">—</strong><small>DATABASE</small></article>
-    </section>
-    <section class="command card">
-      <div class="section-head"><div><p class="eyebrow">NOVA CEO</p><h2>What should the company achieve?</h2></div><span id="integration-state" class="pill">INTEGRATIONS CHECKING</span></div>
-      <form id="command-form"><textarea id="command" rows="4" placeholder="Example: Mujhe agle mahine £5,000 sales chahiye."></textarea><div class="command-footer"><span>Low-risk planning can proceed. Spending, financial and sensitive outbound actions require approval.</span><button>Execute Objective →</button></div></form>
-    </section>
-    <section class="grid two">
-      <article class="card"><div class="section-head"><h2>CEO Response</h2><span id="run-state" class="pill">IDLE</span></div><pre id="response">Give NOVA CEO a command to begin.</pre></article>
-      <article class="card"><div class="section-head"><h2>Critical Issues</h2><span class="pill warning">LIVE STATE</span></div><div id="issues" class="list"><div class="empty">No issue data loaded yet.</div></div></article>
-    </section>
-    <section class="card"><div class="section-head"><h2>Agent Workforce</h2><span id="agent-count" class="pill">—</span></div><div id="agents" class="agents"></div></section>
-  </main>
-</div>
-<script src="app.js"></script>
-</body>
-</html>
+<header class="topbar"><div class="brand"><span class="brand-mark">✦</span><div><b>NovaSpark</b><small>AI Command Center</small></div></div><div class="top-actions"><button id="period" class="select-btn">This Month ▾</button><button class="icon-btn" title="Notifications">♧<span id="approval-badge">0</span></button><button id="logout" class="ghost">Logout</button></div></header>
+<aside class="sidebar"><nav>
+<a class="active">⌂ <span>Dashboard</span></a><a>◈ <span>CEO Command</span></a><a>♙ <span>Customers & CRM</span></a><a>◉ <span>Sales Pipeline</span></a><a>◒ <span>Marketing</span></a><a>⌁ <span>Projects & Delivery</span></a><a>✦ <span>AI Agents</span></a><a>☷ <span>Tasks & Automation</span></a><a>✓ <span>Approvals</span></a><a>▥ <span>Reports & Analytics</span></a><a>£ <span>Finance & Billing</span></a><a>⚙ <span>Settings</span></a><a class="danger-link">⏻ <span>Emergency Stop</span></a>
+</nav><div class="company-card"><span class="brand-mark">✦</span><b>NovaSpark Creative Ltd</b><small>AI-Powered Growth System</small></div><div class="system-card"><span class="live-dot"></span><b>System Status</b><small id="system-copy">Checking operational state…</small></div></aside>
+<main class="main">
+<section class="welcome"><div><h1>Good evening, Founder 👋</h1><p>NovaSpark AI OS is working for your business.</p></div><button id="stop" class="danger">🛑 Emergency Stop</button></section>
+<section class="ceo-banner card"><div class="ceo-copy"><p class="eyebrow">NOVA CEO COMMAND</p><h2>Give a goal or command to your AI CEO</h2><form id="command-form"><div class="command-row"><input id="command" placeholder="Example: “NOVA, I want £5,000 in sales next month”"><button>➤ Send Command</button></div></form><div class="quick"><button data-command="Create a plan to reach £5,000 sales next month">Sales Target</button><button data-command="Find new qualified UK customers for NovaSpark">Find New Customers</button><button data-command="Create a marketing growth plan for the next 30 days">Marketing Boost</button><button data-command="Give me a project delivery update">Project Update</button><button data-command="Give me a financial performance report">Financial Report</button></div></div><div class="ceo-insight"><div class="brain">♧</div><div><p class="eyebrow">NOVA CEO INSIGHT</p><strong id="insight-title">Analysing your business…</strong><p id="insight">Live business insight will appear here after data loads.</p><button id="refresh" class="text-btn">Refresh insight →</button></div></div></section>
+<section class="metrics">
+<article class="metric"><span>REVENUE (THIS MONTH)</span><strong id="m-revenue">—</strong><small id="revenue-change">LIVE DATA</small></article><article class="metric"><span>MONTHLY TARGET</span><strong id="m-target">—</strong><div class="progress"><i id="target-progress"></i></div><small id="target-pct">—</small></article><article class="metric"><span>PIPELINE VALUE</span><strong id="m-pipeline">—</strong><small id="pipeline-meta">—</small></article><article class="metric"><span>FORECAST (MONTH END)</span><strong id="m-forecast">—</strong><small id="forecast-meta">CEO FORECAST</small></article><article class="metric"><span>NEW LEADS</span><strong id="m-leads">—</strong><small id="lead-meta">LIVE DATA</small></article></section>
+<section class="dashboard-grid">
+<article class="card pipeline"><div class="section-head"><h2>Sales Pipeline</h2><span class="pill">LIVE</span></div><div id="pipeline-stages" class="stages"></div><div id="top-opps" class="opps"></div><button class="text-btn">View Full Pipeline →</button></article>
+<article class="card projects"><div class="section-head"><h2>Active Projects</h2><span class="pill">LIVE</span></div><div id="project-list" class="project-list"></div><button class="text-btn">View All Projects →</button></article>
+<article class="card agents-panel"><div class="section-head"><h2>AI Agents Status</h2><span id="agent-online" class="live-pill">● Checking</span></div><div id="agents" class="agents"></div></article>
+</section>
+<section class="lower-grid">
+<article class="card"><div class="section-head"><h2>Pending Approvals</h2><span id="approval-count" class="badge">0</span></div><div id="approvals" class="list"></div><button class="text-btn">View All Approvals →</button></article>
+<article class="card"><div class="section-head"><h2>Recent Activity</h2><span class="pill">LIVE</span></div><div id="activity" class="list"></div><button class="text-btn">View All Activity →</button></article>
+<article class="card"><div class="section-head"><h2>Tasks Overview</h2><span id="task-total" class="pill">0</span></div><div class="task-ring"><div><strong id="task-number">0</strong><small>Total Tasks</small></div></div><div id="task-summary" class="task-summary"></div></article>
+</section>
+<section class="card health"><div class="section-head"><h2>System & Integration Health</h2><span id="integration-state" class="pill">CHECKING</span></div><div id="health-grid" class="health-grid"></div></section>
+</main></div><script src="app.js"></script></body></html>
