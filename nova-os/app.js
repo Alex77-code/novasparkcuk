@@ -1,57 +1,19 @@
-let config = null;
-let accessToken = localStorage.getItem('nova_access_token');
-let orgId = null;
-const $ = (id) => document.getElementById(id);
-const setStatus = (text, cls='') => { $('auth-status').textContent=text; $('auth-status').className=`status ${cls}`; };
-
-async function loadConfig(){
-  const r=await fetch('/.netlify/functions/config'); config=await r.json();
-  if(!config.configured){setStatus('ACTION REQUIRED: Supabase is not connected in Netlify environment variables.');return false;} return true;
-}
-async function authUser(){
-  const r=await fetch(`${config.supabaseUrl}/auth/v1/user`,{headers:{apikey:config.supabaseAnonKey,Authorization:`Bearer ${accessToken}`}}); return r;
-}
-async function login(e){
-  e.preventDefault(); setStatus('Signing in…'); if(!await loadConfig())return;
-  const r=await fetch(`${config.supabaseUrl}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:config.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email:$('email').value,password:$('password').value})});
-  const data=await r.json(); if(!r.ok){setStatus(data.error_description||data.msg||'Sign-in failed.');return;}
-  accessToken=data.access_token;localStorage.setItem('nova_access_token',accessToken);await boot();
-}
-async function boot(){
-  if(!config&&!await loadConfig())return;
-  if(!accessToken){$('auth').hidden=false;$('app').hidden=true;return;}
-  const me=await authUser();
-  if(!me.ok){accessToken=null;localStorage.removeItem('nova_access_token');$('auth').hidden=false;$('app').hidden=true;setStatus('Session expired. Please sign in again.');return;}
-  const user=await me.json();
-  if(config.ownerEmail&&user.email!==config.ownerEmail){accessToken=null;localStorage.removeItem('nova_access_token');setStatus('OWNER ACCESS REQUIRED');return;}
-  $('auth').hidden=true;$('app').hidden=false;setStatus('');await loadState();
-}
-async function loadState(){
-  const r=await fetch('/.netlify/functions/state',{headers:{Authorization:`Bearer ${accessToken}`}}); const data=await r.json();
-  if(!r.ok){$('system-state').textContent=data.error||'STATE ERROR';return;}
-  orgId=data.org.id; const stop=data.controls?.emergency_stop;
-  $('system-state').textContent=stop?'EMERGENCY STOP':'HEALTHY FOUNDATION';$('system-state').className=`pill ${stop?'warning':''}`;
-  $('integration-state').textContent=`${data.integrations.filter(x=>x.status==='CONNECTED').length}/${data.integrations.length} CONNECTED`;
-  const goal=data.goals[0];
-  $('m-target').textContent=goal?.target_value?`${goal.target_currency||'GBP'} ${Number(goal.target_value).toLocaleString()}`:'—';
-  $('m-forecast').textContent=goal?.forecast?.value?`${goal.target_currency||'GBP'} ${Number(goal.forecast.value).toLocaleString()}`:'—';
-  $('m-tasks').textContent=data.tasks.filter(t=>['PLANNED','PENDING','RUNNING','WAITING_APPROVAL'].includes(t.status)).length;
-  $('agent-count').textContent=`${data.agents.length} AGENTS`;
-  $('agents').innerHTML=data.agents.map(a=>`<div class="agent"><strong><span class="status-dot ${String(a.status).toLowerCase()}"></span>${escapeHtml(a.name)}</strong><small>${escapeHtml(a.role)} · ${escapeHtml(a.status)}</small></div>`).join('');
-  $('issues').innerHTML=stop?'<div class="issue">Emergency stop is active. Outbound and spending workflows remain halted.</div>':'<div class="empty">No critical issues reported by the foundation layer.</div>';
-}
-async function command(e){
-  e.preventDefault();const commandText=$('command').value.trim();if(!commandText)return;
-  $('run-state').textContent='RUNNING';$('response').textContent='NOVA CEO is analysing company state and creating an execution plan…';
-  const r=await fetch('/.netlify/functions/ceo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:JSON.stringify({command:commandText})});
-  const data=await r.json();if(!r.ok){$('run-state').textContent='FAILED';$('response').textContent=JSON.stringify(data,null,2);return;}
-  $('run-state').textContent='COMPLETED';$('response').textContent=JSON.stringify(data,null,2);$('command').value='';await loadState();
-}
-async function emergencyStop(){
-  if(!confirm('Activate EMERGENCY STOP? This halts outbound and spending workflows.'))return;
-  const r=await fetch('/.netlify/functions/emergency-stop',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`}});
-  if(!r.ok){const d=await r.json();alert(d.message||d.error||'Emergency stop failed.');return;} await loadState();
-}
-function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-$('login-form').addEventListener('submit',login);$('command-form').addEventListener('submit',command);$('stop').addEventListener('click',emergencyStop);$('logout').addEventListener('click',()=>{localStorage.removeItem('nova_access_token');location.reload();});
-loadConfig().then(()=>boot()).catch(e=>setStatus(`Configuration error: ${e.message}`));
+let config=null;let accessToken=localStorage.getItem('nova_access_token');const $=id=>document.getElementById(id);const money=(n,c='GBP')=>n==null||Number.isNaN(Number(n))?'—':new Intl.NumberFormat('en-GB',{style:'currency',currency:c,maximumFractionDigits:0}).format(Number(n));const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function setStatus(text,cls=''){if($('auth-status')){$('auth-status').textContent=text;$('auth-status').className=`status ${cls}`}}
+async function loadConfig(){const r=await fetch('/.netlify/functions/config');config=await r.json();if(!config.configured){setStatus('ACTION REQUIRED: connect Supabase in Netlify environment variables.');return false}return true}
+async function authUser(){return fetch(`${config.supabaseUrl}/auth/v1/user`,{headers:{apikey:config.supabaseAnonKey,Authorization:`Bearer ${accessToken}`}})}
+async function login(e){e.preventDefault();setStatus('Signing in…');if(!await loadConfig())return;const r=await fetch(`${config.supabaseUrl}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:config.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email:$('email').value,password:$('password').value})});const d=await r.json();if(!r.ok){setStatus(d.error_description||d.msg||'Sign-in failed.');return}accessToken=d.access_token;localStorage.setItem('nova_access_token',accessToken);await boot()}
+async function boot(){if(!config&&!await loadConfig())return;if(!accessToken){$('auth').hidden=false;$('app').hidden=true;return}const me=await authUser();if(!me.ok){accessToken=null;localStorage.removeItem('nova_access_token');$('auth').hidden=false;$('app').hidden=true;setStatus('Session expired. Please sign in again.');return}const user=await me.json();if(config.ownerEmail&&user.email!==config.ownerEmail){accessToken=null;localStorage.removeItem('nova_access_token');setStatus('OWNER ACCESS REQUIRED');return}$('auth').hidden=true;$('app').hidden=false;await loadState()}
+function renderStages(opps){const stages=['NEW','QUALIFIED','CONTACTED','ENGAGED','MEETING','PROPOSAL','NEGOTIATION','WON'];const counts=Object.fromEntries(stages.map(s=>[s,0]));(opps||[]).forEach(o=>{if(counts[o.stage]!=null)counts[o.stage]++});const max=Math.max(1,...Object.values(counts));$('pipeline-stages').innerHTML=stages.map(s=>`<div class="stage"><b>${s.replace('_',' ')}</b><div class="stage-bar"><i style="width:${counts[s]/max*100}%"></i></div><span>${counts[s]}</span></div>`).join('')}
+function renderProjects(projects){if(!projects?.length){$('project-list').innerHTML='<div class="empty">No client projects are currently recorded.</div>';return}$('project-list').innerHTML=projects.slice(0,6).map(p=>{const s=String(p.status||'').toUpperCase();const pct=s==='COMPLETED'?100:s==='IN_PROGRESS'?60:s==='REVIEW'?90:s==='PLANNED'?15:35;return `<div class="project"><div class="project-row"><div><b>${esc(p.name)}</b><small>${esc(s.replaceAll('_',' '))}</small></div><strong>${pct}%</strong></div><div class="project-progress"><i style="width:${pct}%"></i></div></div>`}).join('')}
+function renderAgents(agents){const visible=(agents||[]).filter(a=>['CEO','COO','CMO','CRO','PROSPECTOR','SALES','OUTREACH','DELIVERY','SEO','CONTENT','SOCIAL','ADS'].some(k=>String(a.key||'').includes(k.toLowerCase()))).slice(0,12);$('agents').innerHTML=(visible.length?visible:agents||[]).map(a=>`<div class="agent"><div><b><span class="status-dot ${String(a.status||'').toLowerCase()}"></span>${esc(a.name)}</b><small>${esc(a.role)}</small></div><span class="pill">${esc(a.status)}</span></div>`).join('');const online=(agents||[]).filter(a=>['ONLINE','BUSY'].includes(a.status)).length;$('agent-online').textContent=`● ${online}/${(agents||[]).length} ONLINE`}
+function renderList(id,items,empty,mapper){$(id).innerHTML=items?.length?items.slice(0,6).map(mapper).join(''):`<div class="empty">${empty}</div>`}
+function renderHealth(health,integrations){const all=[...(health||[]).map(h=>({name:h.component,status:h.status,detail:h.error||`${h.latency_ms||0}ms`})),...(integrations||[]).map(i=>({name:i.provider,status:i.status,detail:i.status}))];$('health-grid').innerHTML=all.slice(0,12).map(x=>{const cls=x.status==='CONNECTED'||x.status==='OK'||x.status==='HEALTHY'?'ok':x.status==='WARNING'||x.status==='NOT_CONNECTED'?'warn':'bad';return `<div class="health-item"><b>${esc(x.name)}</b><small class="${cls}">${esc(x.status)} · ${esc(x.detail)}</small></div>`}).join('')||'<div class="empty">No health telemetry available.</div>'}
+async function loadState(){const r=await fetch('/.netlify/functions/state',{headers:{Authorization:`Bearer ${accessToken}`}});const d=await r.json();if(!r.ok){$('system-copy').textContent=d.error||'State error';return}const stop=d.controls?.emergency_stop;const m=d.metrics||{};const goal=d.goals?.find(g=>g.status==='ACTIVE')||d.goals?.[0];const currency=goal?.target_currency||d.org?.currency||'GBP';const target=Number(goal?.target_value||0);const forecast=Number(goal?.forecast?.value||m.weightedPipeline||0);const pct=target?Math.min(100,(Number(m.revenueThisMonth||0)/target)*100):0;
+$('system-state').textContent=stop?'EMERGENCY STOP':'SYSTEM OPERATIONAL';$('system-state').className=`pill ${stop?'warning':''}`;$('system-copy').textContent=stop?'Emergency stop active. Outbound and spending halted.':'All enabled core systems operational.';$('integration-state').textContent=`${(d.integrations||[]).filter(x=>x.status==='CONNECTED').length}/${(d.integrations||[]).length} CONNECTED`;$('approval-count').textContent=(d.approvals||[]).length;$('approval-badge').textContent=(d.approvals||[]).length;
+$('m-revenue').textContent=money(m.revenueThisMonth,currency);$('m-target').textContent=target?money(target,currency):'—';$('m-pipeline').textContent=money(m.pipelineValue,currency);$('m-forecast').textContent=money(forecast,currency);$('m-leads').textContent=String(m.leadCount||0);$('target-progress').style.width=`${pct}%`;$('target-pct').textContent=target?`${Math.round(pct)}% achieved`:'No active target';$('pipeline-meta').textContent=`${m.opportunityCount||0} opportunities`;$('forecast-meta').textContent=goal?'CEO forecast':'Weighted pipeline';$('lead-meta').textContent=`${m.companyCount||0} companies in OS`;
+$('insight-title').textContent=stop?'Emergency stop is active.':'Business control plane is live.';$('insight').textContent=target?`Target ${money(target,currency)} · actual ${money(m.revenueThisMonth,currency)} · pipeline ${money(m.pipelineValue,currency)}. NOVA will keep planning against real state.`:`${m.leadCount||0} leads, ${m.opportunityCount||0} opportunities and ${m.activeTasks||0} active tasks are currently recorded.`;
+renderStages(d.opportunities);renderProjects(d.projects);renderAgents(d.agents);renderList('approvals',d.approvals,'No pending owner approvals.',a=>`<div class="list-item"><b>${esc(a.action)}</b><small>${esc(a.risk)} risk · waiting for owner decision</small></div>`);renderList('activity',d.activities,'No recent activity recorded.',a=>`<div class="list-item"><b>${esc(a.subject||a.type)}</b><small>${esc(a.type)} · ${new Date(a.occurred_at).toLocaleString('en-GB')}</small></div>`);const tasks=d.tasks||[];const completed=tasks.filter(t=>t.status==='COMPLETED').length,running=tasks.filter(t=>['RUNNING','PENDING'].includes(t.status)).length,pending=tasks.filter(t=>t.status==='WAITING_APPROVAL').length,failed=tasks.filter(t=>['FAILED','BLOCKED'].includes(t.status)).length;$('task-total').textContent=tasks.length;$('task-number').textContent=tasks.length;$('task-summary').innerHTML=`<span>● Completed ${completed}</span><span>● Active ${running}</span><span>● Approval ${pending}</span><span>● Failed ${failed}</span>`;renderHealth(d.health,d.integrations)}
+async function command(e){e.preventDefault();const text=$('command').value.trim();if(!text)return;$('insight-title').textContent='NOVA CEO is executing…';$('insight').textContent='Analysing your objective, business state and available agents.';const r=await fetch('/.netlify/functions/ceo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:JSON.stringify({command:text})});const d=await r.json();if(!r.ok){$('insight-title').textContent='Execution failed';$('insight').textContent=d.message||d.error||'CEO request failed.';return}$('command').value='';$('insight-title').textContent=d.plan?.title||'Objective accepted';$('insight').textContent=d.plan?.summary||d.message||'NOVA created an execution plan.';await loadState()}
+async function emergencyStop(){if(!confirm('Activate EMERGENCY STOP? This halts outbound and spending workflows.'))return;const r=await fetch('/.netlify/functions/emergency-stop',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`}});if(!r.ok){const d=await r.json();alert(d.message||d.error||'Emergency stop failed.');return}await loadState()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-command]');if(b){$('command').value=b.dataset.command;$('command').focus()}});$('login-form').addEventListener('submit',login);$('command-form').addEventListener('submit',command);$('stop').addEventListener('click',emergencyStop);$('refresh').addEventListener('click',loadState);$('logout').addEventListener('click',()=>{localStorage.removeItem('nova_access_token');location.reload()});loadConfig().then(()=>boot()).catch(e=>setStatus(`Configuration error: ${e.message}`));
