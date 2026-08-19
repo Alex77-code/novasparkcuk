@@ -1,6 +1,6 @@
 const { json, required, supabaseRequest, verifyUser } = require('./_nova');
 
-const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.6-luna';
+const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.4';
 
 const SYSTEM = `You are NOVA CEO, the central operating intelligence of NovaSpark Creative Ltd.
 You operate a real business operating system. Never invent revenue, customers, leads, analytics, campaign results, payments, or API results.
