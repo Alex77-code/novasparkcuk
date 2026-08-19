@@ -104,3 +104,71 @@ if(pointer.matches){
     el.addEventListener('pointerleave',()=>{el.style.transform='';});
   });
 }
+
+/* Premium scroll-driven layer inspired by modern UK agency interaction patterns.
+   This keeps NovaSpark's existing content but adds depth, pinned-style moments,
+   progressive counters, cursor glow and section-aware motion. */
+const motionStyle=document.createElement('style');
+motionStyle.textContent=`
+  :root{--nova-sky:#69d8ff;--nova-blue:#168bd3;--nova-ice:#e9f9ff}
+  body{background:#fff}
+  .motion-glow{position:fixed;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(105,216,255,.12),rgba(22,139,211,0) 68%);transform:translate(-50%,-50%);opacity:0;transition:opacity .25s ease;mix-blend-mode:multiply}
+  .hero,.section,.header,footer{position:relative}
+  .hero:after,.section:after{content:'';position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(105,216,255,.28),transparent);pointer-events:none}
+  .hero:after{bottom:0}.section:after{bottom:0}
+  .hero-art .panel{transition:transform .18s ease-out,box-shadow .5s ease}.hero-art .panel:hover{box-shadow:0 45px 110px rgba(11,78,162,.28)}
+  .orbital{transition:transform .3s ease-out}
+  .service-grid,.cap-grid,.process-grid{perspective:1200px}
+  .service.seen,.cap-grid article.seen,.process-grid article.seen{transform:translate3d(0,0,0) rotateX(0)}
+  .service:not(.seen),.cap-grid article:not(.seen),.process-grid article:not(.seen){transform:translate3d(0,46px,0) rotateX(3deg)}
+  .service:hover{transform:translateY(-10px) rotateX(0)!important}
+  .service .service-symbol{transition:transform .5s cubic-bezier(.16,1,.3,1),color .3s}.service:hover .service-symbol{transform:translateY(-5px) scale(1.08) rotate(-5deg)}
+  .cap-grid article h3,.process-grid article h3{transition:transform .5s}.cap-grid article:hover h3,.process-grid article:hover h3{transform:translateX(5px)}
+  .scroll-scene{position:relative;min-height:125vh;display:flex;align-items:center}
+  .scroll-scene .scene-inner{width:100%;position:sticky;top:12vh}
+  .scene-word{font:800 clamp(55px,9vw,150px)/.82 'Manrope';letter-spacing:-.09em;color:rgba(22,139,211,.06);white-space:nowrap;position:absolute;left:-2vw;top:12%;pointer-events:none;transform:translateX(var(--scene-x,0px));transition:transform .08s linear}
+  .scene-card{background:linear-gradient(145deg,#061b32,#0b4f83);border:1px solid rgba(105,216,255,.25);border-radius:26px;padding:clamp(28px,5vw,70px);color:#fff;min-height:430px;display:grid;grid-template-columns:1fr .9fr;gap:50px;align-items:center;overflow:hidden;box-shadow:0 40px 100px rgba(7,47,80,.2);transform:translateY(var(--scene-y,0px)) scale(var(--scene-scale,1));transition:box-shadow .4s}
+  .scene-card h2{font-size:clamp(42px,6vw,76px);line-height:.95;letter-spacing:-.07em;margin:0 0 20px}.scene-card p{color:#c4e4f4;max-width:540px}.scene-visual{height:300px;border:1px solid rgba(255,255,255,.14);border-radius:20px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(105,216,255,.28),transparent 32%),linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.01))}.scene-visual i{position:absolute;border:1px solid rgba(105,216,255,.35);border-radius:50%;width:300px;height:120px;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-20deg)}.scene-visual i:nth-child(2){width:360px;height:180px;transform:translate(-50%,-50%) rotate(28deg)}.scene-visual b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:75px;height:75px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#0b4f83;box-shadow:0 0 55px rgba(105,216,255,.65);font-size:10px}
+  .scene-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#78d9ff;font-weight:800}
+  .scene-list{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.scene-list span{padding:9px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;font-size:10px;color:#e7f8ff;background:rgba(255,255,255,.04)}
+  @media(max-width:760px){.scroll-scene{min-height:115vh}.scene-card{grid-template-columns:1fr;gap:20px;min-height:600px;padding:30px 24px}.scene-visual{height:230px}.scene-word{top:7%;font-size:70px}.motion-glow{display:none}}
+  @media(prefers-reduced-motion:reduce){.motion-glow{display:none}.scene-card{transform:none!important}.scene-word{transform:none!important}}
+`;
+document.head.appendChild(motionStyle);
+
+const glow=document.createElement('div');glow.className='motion-glow';document.body.appendChild(glow);
+if(pointer.matches){
+  addEventListener('pointermove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';glow.style.opacity='.9'},{passive:true});
+  addEventListener('pointerleave',()=>glow.style.opacity='0');
+}
+
+/* Add a new scroll-story section without changing the existing HTML content. */
+const anchor=document.querySelector('#capabilities');
+if(anchor && !document.querySelector('.nova-scroll-story')){
+  const scene=document.createElement('section');
+  scene.className='section scroll-scene nova-scroll-story';
+  scene.setAttribute('aria-label','NovaSpark growth system');
+  scene.innerHTML=`<div class="wrap scene-inner"><div class="scene-word" aria-hidden="true">GROWTH</div><div class="scene-card"><div><div class="scene-label">NovaSpark / Growth system</div><h2>Strategy that moves with your business.</h2><p>We connect visibility, demand, digital experience and automation into one progressive growth journey.</p><div class="scene-list"><span>Discover</span><span>Position</span><span>Launch</span><span>Optimise</span><span>Scale</span></div></div><div class="scene-visual" aria-hidden="true"><i></i><i></i><b>GROW</b></div></div></div></section>`;
+  anchor.parentNode.insertBefore(scene,anchor);
+}
+
+const scene=document.querySelector('.nova-scroll-story');
+function updateScene(){
+  if(!scene||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const r=scene.getBoundingClientRect();
+  const total=Math.max(scene.offsetHeight-innerHeight,1);
+  const p=Math.max(0,Math.min(1,-r.top/total));
+  scene.style.setProperty('--scene-y',`${(0.5-p)*24}px`);
+  scene.style.setProperty('--scene-scale',(1-0.035*Math.abs(.5-p)).toFixed(4));
+  const word=scene.querySelector('.scene-word');if(word)word.style.setProperty('--scene-x',`${(p-.5)*100}px`);
+  const card=scene.querySelector('.scene-card');if(card)card.style.boxShadow=`0 ${35+Math.round(p*20)}px ${90+Math.round(p*35)}px rgba(7,47,80,${.16+.08*p})`;
+}
+addEventListener('scroll',updateScene,{passive:true});addEventListener('resize',updateScene);updateScene();
+
+/* Section-aware navigation state */
+const navSections=[...document.querySelectorAll('main section[id]')];
+const navObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('#navlinks a').forEach(a=>a.classList.remove('active'));const a=document.querySelector(`#navlinks a[href="#${e.target.id}"]`);if(a)a.classList.add('active');}}),{rootMargin:'-35% 0px -55% 0px',threshold:0});
+navSections.forEach(s=>navObserver.observe(s));
+
+/* Magnetic hero visual */
+if(pointer.matches && heroArt){heroArt.addEventListener('pointermove',e=>{const r=heroArt.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)/r.width;const y=(e.clientY-r.top-r.height/2)/r.height;const panel=heroArt.querySelector('.panel');if(panel)panel.style.transform=`translate3d(${x*12}px,${y*12}px,0)`;heroArt.querySelectorAll('.orbital').forEach((o,i)=>o.style.transform=`rotate(${i?28:-18}deg) translate(${x*(i?10:-7)}px,${y*8}px)`);});heroArt.addEventListener('pointerleave',()=>{const panel=heroArt.querySelector('.panel');if(panel)panel.style.transform='';heroArt.querySelectorAll('.orbital').forEach((o,i)=>o.style.transform=`rotate(${i?28:-18}deg)`);});}
