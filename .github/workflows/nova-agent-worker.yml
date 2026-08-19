@@ -1,0 +1,41 @@
+name: NovaSpark Agent Worker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+concurrency:
+  group: novaspark-agent-worker
+  cancel-in-progress: false
+
+jobs:
+  worker-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch queued tasks
+        env:
+          URL: ${{ secrets.NOVA_ORCHESTRATOR_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
+
+      - name: Execute running tasks
+        env:
+          URL: ${{ secrets.NOVA_EXECUTION_WORKER_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
+
+      - name: Run delivery QA gate
+        env:
+          URL: ${{ secrets.NOVA_QA_URL }}
+          SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$URL"; test -n "$SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 -X POST "$URL" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" -d '{}'
