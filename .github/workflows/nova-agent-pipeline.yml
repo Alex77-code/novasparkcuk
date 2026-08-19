@@ -1,0 +1,42 @@
+name: NovaSpark Agent Pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+concurrency:
+  group: novaspark-agent-pipeline
+  cancel-in-progress: false
+
+jobs:
+  dispatch-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch queued AI tasks
+        env:
+          NOVA_DISPATCH_URL: ${{ secrets.NOVA_AI_DISPATCH_URL }}
+          NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$NOVA_DISPATCH_URL"
+          test -n "$NOVA_CRON_SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 \
+            -X POST "$NOVA_DISPATCH_URL" \
+            -H "Authorization: Bearer $NOVA_CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+      - name: Run AI agent runtime
+        env:
+          NOVA_AI_RUNTIME_URL: ${{ secrets.NOVA_AI_RUNTIME_URL }}
+          NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$NOVA_AI_RUNTIME_URL"
+          test -n "$NOVA_CRON_SECRET"
+          curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 120 \
+            -X POST "$NOVA_AI_RUNTIME_URL" \
+            -H "Authorization: Bearer $NOVA_CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d '{}'
