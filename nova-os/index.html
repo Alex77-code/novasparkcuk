@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NovaSpark AI Command Center</title>
+<meta name="description" content="NovaSpark Creative Ltd AI Business Operating System">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="auth" class="screen">
+  <div class="card auth-card">
+    <div class="brand"><span class="dot"></span>NOVASPARK AI</div>
+    <h1>CEO Command Center</h1>
+    <p>Owner access only. Real data only. No simulated business results.</p>
+    <form id="login-form">
+      <input id="email" type="email" autocomplete="username" placeholder="Owner email" required>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button>Sign in</button>
+    </form>
+    <div id="auth-status" class="status">Checking configuration…</div>
+  </div>
+</div>
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span>NOVA CEO</div>
+    <div class="top-actions"><span id="system-state" class="pill">SYSTEM CHECKING</span><button id="logout" class="ghost">Logout</button></div>
+  </header>
+  <aside class="sidebar">
+    <nav>
+      <a class="active">CEO</a><a>Revenue</a><a>Sales</a><a>Leads</a><a>CRM</a><a>Marketing</a><a>SEO</a><a>Content</a><a>Social</a><a>Ads</a><a>Clients</a><a>Projects</a><a>Tasks</a><a>Finance</a><a>Analytics</a><a>Agents</a><a>Automations</a><a>Approvals</a><a>Memory</a><a>Integrations</a><a>Security</a><a>Audit Logs</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <section class="hero">
+      <div><p class="eyebrow">AUTONOMOUS BUSINESS OPERATING SYSTEM</p><h1>Good evening, Founder.</h1><p>Give NOVA CEO an objective. It converts the objective into measurable plans, projects, tasks and approvals.</p></div>
+      <button id="stop" class="danger">🛑 EMERGENCY STOP</button>
+    </section>
+    <section class="grid metrics">
+      <article><span>Revenue Today</span><strong id="m-revenue">—</strong><small>REAL DATA</small></article>
+      <article><span>Revenue Target</span><strong id="m-target">—</strong><small>FROM GOALS</small></article>
+      <article><span>Forecast</span><strong id="m-forecast">—</strong><small>CEO FORECAST</small></article>
+      <article><span>Pipeline</span><strong id="m-pipeline">—</strong><small>REAL DATA</small></article>
+      <article><span>New Leads</span><strong id="m-leads">—</strong><small>REAL DATA</small></article>
+      <article><span>Active Tasks</span><strong id="m-tasks">—</strong><small>DATABASE</small></article>
+    </section>
+    <section class="command card">
+      <div class="section-head"><div><p class="eyebrow">NOVA CEO</p><h2>What should the company achieve?</h2></div><span id="integration-state" class="pill">INTEGRATIONS CHECKING</span></div>
+      <form id="command-form"><textarea id="command" rows="4" placeholder="Example: Mujhe agle mahine £5,000 sales chahiye."></textarea><div class="command-footer"><span>Low-risk planning can proceed. Spending, financial and sensitive outbound actions require approval.</span><button>Execute Objective →</button></div></form>
+    </section>
+    <section class="grid two">
+      <article class="card"><div class="section-head"><h2>CEO Response</h2><span id="run-state" class="pill">IDLE</span></div><pre id="response">Give NOVA CEO a command to begin.</pre></article>
+      <article class="card"><div class="section-head"><h2>Critical Issues</h2><span class="pill warning">LIVE STATE</span></div><div id="issues" class="list"><div class="empty">No issue data loaded yet.</div></div></article>
+    </section>
+    <section class="card"><div class="section-head"><h2>Agent Workforce</h2><span id="agent-count" class="pill">—</span></div><div id="agents" class="agents"></div></section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
