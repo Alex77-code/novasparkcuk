@@ -1,0 +1,29 @@
+name: NovaSpark CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate JavaScript files
+        shell: bash
+        run: |
+          set -e
+          files=$(find netlify/functions -type f -name '*.js' 2>/dev/null || true)
+          for f in $files; do
+            node --check "$f"
+          done
+      - name: Validate frontend HTML exists
+        shell: bash
+        run: test -f public/ai-command-center.html
