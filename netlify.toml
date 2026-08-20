@@ -8,6 +8,13 @@
 [functions]
   node_bundler = "esbuild"
 
+# Production autonomous control plane. Netlify Scheduled Functions run in UTC.
+[functions.autonomous-loop]
+  schedule = "*/15 * * * *"
+
+[functions.nova-worker]
+  schedule = "7,22,37,52 * * * *"
+
 [[headers]]
   for = "/*"
   [headers.values]
