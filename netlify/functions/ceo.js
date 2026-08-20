@@ -1,6 +1,6 @@
 const { json, required, supabaseRequest, verifyUser } = require('./_nova');
 
-const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.4';
+const MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
 
 const SYSTEM = `You are NOVA CEO, the central operating intelligence of NovaSpark Creative Ltd.
 You operate a real business operating system. Never invent revenue, customers, leads, analytics, campaign results, payments, or API results.
@@ -48,18 +48,36 @@ exports.handler = async (event) => {
     const prompt = `${SYSTEM}\n\nCURRENT COMPANY STATE:\n${JSON.stringify(context)}\n\nOWNER COMMAND:\n${command}`;
 
     const started = Date.now();
-    const aiResponse = await fetch('https://api.openai.com/v1/responses', {
+    const apiKey = required('OPENROUTER_API_KEY');
+    const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${required('OPENAI_API_KEY')}` },
-      body: JSON.stringify({ model: MODEL, input: prompt })
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': process.env.URL || 'https://novasparkcuk.netlify.app',
+        'X-Title': 'NovaSpark Creative Ltd AI CEO'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM },
+          { role: 'user', content: `CURRENT COMPANY STATE:\n${JSON.stringify(context)}\n\nOWNER COMMAND:\n${command}` }
+        ],
+        temperature: 0.2
+      })
     });
     const aiText = await aiResponse.text();
-    if (!aiResponse.ok) throw new Error(`OpenAI ${aiResponse.status}: ${aiText}`);
+    if (!aiResponse.ok) throw new Error(`OpenRouter ${aiResponse.status}: ${aiText}`);
     const raw = JSON.parse(aiText);
-    const outputText = raw.output_text || raw.output?.flatMap(x => x.content || []).map(x => x.text || '').join('') || '';
+    const outputText = raw.choices?.[0]?.message?.content || '';
 
     let plan;
-    try { plan = JSON.parse(outputText); } catch { plan = { intent: 'analysis', summary: outputText, projects: [], tasks: [], approvals: [], risks: [], next_actions: [] }; }
+    try {
+      const cleaned = outputText.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+      plan = JSON.parse(cleaned);
+    } catch {
+      plan = { intent: 'analysis', summary: outputText, projects: [], tasks: [], approvals: [], risks: [], next_actions: [] };
+    }
 
     let goal = null;
     if (plan.target !== undefined || plan.intent || plan.strategy) {
