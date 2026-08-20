@@ -1,0 +1,36 @@
+name: NovaSpark Security
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  security-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Block committed secrets
+        shell: bash
+        run: |
+          set -e
+          if git grep -n -I -E 'sk-[A-Za-z0-9_-]{20,}|SUPABASE_SERVICE_ROLE_KEY\s*=\s*[^$\{[:space:]]+|OPENAI_API_KEY\s*=\s*sk-' -- . ':!package-lock.json'; then
+            echo 'Potential hard-coded secret detected.'
+            exit 1
+          fi
+      - name: Check required security primitives
+        shell: bash
+        run: |
+          set -e
+          test -f netlify/functions/_owner-guard.js
+          test -f netlify/functions/owner-auth-gate.js
+          test -f public/auth-guard.js
+          grep -q 'requireOwner' netlify/functions/_owner-guard.js
+          grep -q 'EMERGENCY_STOP_ACTIVE' netlify/functions/_owner-guard.js
+          grep -q 'novasparkcreative@gmail.com' netlify/functions/_owner-guard.js
+      - name: Check PWA security assets
+        shell: bash
+        run: |
+          set -e
+          test -f public/manifest.webmanifest
+          test -f public/sw.js
