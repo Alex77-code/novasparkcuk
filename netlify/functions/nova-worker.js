@@ -3,14 +3,19 @@ const { json, required, supabaseRequest } = require('./_nova');
 const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.6-luna';
 
 function authWorker(event) {
-  const configured = process.env.NOVA_WORKER_SECRET;
+  // Scheduled/internal invocation is only accepted when Netlify supplies no HTTP method.
+  // HTTP callers must present the same protected cron secret used by the autonomous loop.
+  if (!event.httpMethod) return Boolean(process.env.NOVA_CRON_SECRET || process.env.NETLIFY);
+  const configured = process.env.NOVA_WORKER_SECRET || process.env.NOVA_CRON_SECRET;
   if (!configured) return false;
-  const supplied = event.headers['x-nova-worker-secret'] || event.headers['X-Nova-Worker-Secret'];
-  return supplied && supplied === configured;
+  const supplied = event.headers?.authorization?.startsWith('Bearer ')
+    ? event.headers.authorization.slice(7)
+    : (event.headers?.['x-nova-worker-secret'] || event.headers?.['X-Nova-Worker-Secret']);
+  return supplied === configured;
 }
 
 async function getOrg() {
-  const rows = await supabaseRequest('organizations?select=id,name,timezone,currency&name=eq.NovaSpark%20Creative&limit=1');
+  const rows = await supabaseRequest('organizations?select=id,name,slug,timezone,currency&slug=eq.novaspark-creative&limit=1');
   if (!rows?.[0]) throw new Error('NovaSpark organization is missing.');
   return rows[0];
 }
@@ -18,7 +23,8 @@ async function getOrg() {
 async function aiExecute(org, task, agent, context) {
   const system = `You are an execution worker inside NovaSpark Creative Ltd AI-BOS. Execute only the supplied task using the supplied company state. Never invent real-world actions, leads, payments, campaign launches, emails sent, customers, or revenue. If the task requires an unavailable external integration, return status ACTION_REQUIRED and explain the exact missing integration. Low-risk internal work such as analysis, planning, scoring, drafting, reporting, data normalization and task decomposition may be completed. Never send unsolicited outbound communication, spend money, alter financial records, or make contractual commitments. Return JSON: {status:"COMPLETED"|"ACTION_REQUIRED"|"FAILED",summary:string,outputs:object,next_tasks:[{title,description,agent_key,priority,risk,approval_required}],requires_approval:boolean,approval_reason:string|null}.`;
   const input = `${system}\n\nORGANIZATION:\n${JSON.stringify(org)}\n\nAGENT:\n${JSON.stringify(agent)}\n\nTASK:\n${JSON.stringify(task)}\n\nCOMPANY STATE:\n${JSON.stringify(context)}`;
-  const response = await fetch('https://api.openai.com/v1/responses', {
+  const base = (process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/$/, '');
+  const response = await fetch(`${base}/v1/responses`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${required('OPENAI_API_KEY')}` },
     body: JSON.stringify({ model: MODEL, input })
@@ -30,7 +36,7 @@ async function aiExecute(org, task, agent, context) {
   try { return JSON.parse(outputText); } catch { return { status: 'FAILED', summary: outputText || 'Model returned no structured output.', outputs: {}, next_tasks: [], requires_approval: false, approval_reason: null }; }
 }
 
-async function claimTask(task, org) {
+async function claimTask(task) {
   const updated = await supabaseRequest(`tasks?id=eq.${task.id}&status=eq.PLANNED`, {
     method: 'PATCH', headers: { Prefer: 'return=representation' },
     body: JSON.stringify({ status: 'RUNNING', started_at: new Date().toISOString(), updated_at: new Date().toISOString() })
@@ -62,7 +68,7 @@ async function createNextTasks(org, tasks, agents) {
 }
 
 exports.handler = async (event) => {
-  if (!['POST','GET'].includes(event.httpMethod)) return json(405, { error: 'METHOD_NOT_ALLOWED' });
+  if (event.httpMethod && !['POST','GET'].includes(event.httpMethod)) return json(405, { error: 'METHOD_NOT_ALLOWED' });
   if (!authWorker(event)) return json(401, { error: 'WORKER_AUTH_REQUIRED' });
   try {
     const org = await getOrg();
@@ -75,14 +81,14 @@ exports.handler = async (event) => {
       supabaseRequest(`agents?organization_id=eq.${org.id}&select=id,key,name,role,status,permissions,tools,metrics&order=name.asc`),
       supabaseRequest(`goals?organization_id=eq.${org.id}&status=eq.ACTIVE&select=id,title,objective,target_value,target_currency,forecast&order=created_at.desc&limit=10`),
       supabaseRequest(`leads?organization_id=eq.${org.id}&select=id,status,score,source&order=created_at.desc&limit=50`),
-      supabaseRequest(`opportunities?organization_id=eq.${org.id}&select=id,stage,amount,currency,probability,expected_close_date&order=created_at.desc&limit=50`),
+      supabaseRequest(`opportunities?organization_id=eq.${org.id}&select=id,stage,value,currency,probability,expected_close&order=created_at.desc&limit=50`),
       supabaseRequest(`campaigns?organization_id=eq.${org.id}&select=id,name,channel,status,budget,objective&order=created_at.desc&limit=20`)
     ]);
 
     const context = { goals, leads, opportunities, campaigns };
     const processed = [];
     for (const task of tasks || []) {
-      const claimed = await claimTask(task, org);
+      const claimed = await claimTask(task);
       if (!claimed) continue;
       const agent = agents.find(a => a.id === task.agent_id) || agents.find(a => a.key === 'ops') || agents[0];
       const run = await supabaseRequest('agent_runs', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ organization_id: org.id, agent_id: agent?.id || null, task_id: task.id, provider: 'openai', model: MODEL, status: 'RUNNING', input: { task: task.title } }) });
