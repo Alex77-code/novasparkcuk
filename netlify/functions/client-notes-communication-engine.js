@@ -8,10 +8,11 @@ async function run(event){
  const stop=(await supabaseRequest(`system_controls?organization_id=eq.${encodeURIComponent(org)}&select=emergency_stop&limit=1`))?.[0];if(stop?.emergency_stop)return json(200,{skipped:true,reason:'EMERGENCY_STOP'});
  const allowed=Array.isArray(user.organization_ids)?user.organization_ids.includes(org):user.organization_id===org;if(!allowed)return json(403,{error:'ORGANIZATION_ACCESS_DENIED'});
  const project=(await supabaseRequest(`projects?id=eq.${encodeURIComponent(projectId)}&organization_id=eq.${encodeURIComponent(org)}&select=id,name&limit=1`))?.[0];if(!project)return json(404,{error:'PROJECT_NOT_FOUND'});
- const row={organization_id:org,project_id:projectId,type,content,created_by:user.id||null,created_at:new Date().toISOString()};
+ const visibility=type==='INTERNAL_NOTE'?'INTERNAL':'CLIENT_VISIBLE';
+ const row={organization_id:org,project_id:projectId,type,content,visibility,created_by:user.id||null,created_at:new Date().toISOString()};
  const result=await supabaseRequest('client_communications',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(row)});
- await supabaseRequest('events',{method:'POST',body:JSON.stringify({organization_id:org,event_type:'CLIENT_COMMUNICATION_LOGGED',source:'client-notes-communication-engine',payload:{project_id:projectId,type,communication_id:result?.[0]?.id||null}})});
- return json(200,{ok:true,communication:result?.[0]||row,delivery:'LOGGED_ONLY'});
+ await supabaseRequest('events',{method:'POST',body:JSON.stringify({organization_id:org,event_type:'CLIENT_COMMUNICATION_LOGGED',source:'client-notes-communication-engine',payload:{project_id:projectId,type,visibility,communication_id:result?.[0]?.id||null}})});
+ return json(200,{ok:true,communication:result?.[0]||row,delivery:'LOGGED_ONLY',provider_delivery_required:['EMAIL','WHATSAPP'].includes(type)});
 }
 exports.handler=async event=>{if(event.httpMethod!=='POST')return json(405,{error:'METHOD_NOT_ALLOWED'});try{return await run(event);}catch(e){console.error(e);return json(500,{error:'CLIENT_COMMUNICATION_LOG_FAILED'});}};
 module.exports.run=run;
