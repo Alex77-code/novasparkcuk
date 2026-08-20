@@ -1,13 +1,11 @@
-const { json, supabaseRequest, verifyUser } = require('./_nova');
-
+const { json, supabaseRequest } = require('./_nova');
+const { requireOwner } = require('./_owner-guard');
 const PROVIDERS=new Set(['google_ads','meta_ads','analytics','cms','social']);
 const ACTIONS=new Set(['PUBLISH','AD_CHANGE','DELETE','PAYMENT']);
-
 async function run(event){
- const user=await verifyUser(event.headers.authorization||event.headers.Authorization);if(!user)return json(401,{error:'AUTHENTICATION_REQUIRED'});
  const body=JSON.parse(event.body||'{}');const org=String(body.organization_id||'').trim(),queueId=String(body.queue_id||'').trim();
  if(!org||!queueId)return json(400,{error:'ORGANIZATION_AND_QUEUE_REQUIRED'});
- const stop=(await supabaseRequest(`system_controls?organization_id=eq.${encodeURIComponent(org)}&select=emergency_stop&limit=1`))?.[0];if(stop?.emergency_stop)return json(200,{skipped:true,reason:'EMERGENCY_STOP'});
+ const auth=await requireOwner(event,org);if(!auth.ok)return auth.response;
  const rows=await supabaseRequest(`communication_queue?id=eq.${encodeURIComponent(queueId)}&organization_id=eq.${encodeURIComponent(org)}&select=id,status,payload&limit=1`);const item=rows?.[0];if(!item)return json(404,{error:'APPROVAL_REQUEST_NOT_FOUND'});
  if(item.status!=='APPROVED_PENDING_PROVIDER')return json(409,{error:'ACTION_NOT_APPROVED_FOR_PROVIDER',status:item.status});
  const action=String(item.payload?.action||'').toUpperCase(),provider=String(item.payload?.provider||'').toLowerCase();
