@@ -1,0 +1,20 @@
+const { json, supabaseRequest, verifyUser } = require('./_nova');
+
+const ROLES=new Set(['OWNER','ADMIN','MANAGER','OPERATIONS','PROJECT_MANAGER']);
+const SERVICE_TASKS={SEO:['Technical SEO audit','Keyword research','On-page optimisation','Content optimisation','SEO QA'],SOCIAL_MEDIA:['Content calendar','Creative production','Client approval','Publishing','Performance review'],GOOGLE_ADS:['Conversion tracking','Campaign setup','Ad copy QA','Launch review','Performance optimisation'],META_ADS:['Pixel/event QA','Audience setup','Creative QA','Launch review','Performance optimisation'],EMAIL_MARKETING:['Audience segmentation','Email sequence','Copy QA','Test send','Performance review'],WEBSITE:['UX/CRO audit','Landing page build','Mobile QA','Conversion QA','Client approval'],VIDEO:['Script','Shot list','Edit','Caption/brand QA','Client approval']};
+async function run(event){
+ const user=await verifyUser(event.headers.authorization||event.headers.Authorization);if(!user)return json(401,{error:'AUTHENTICATION_REQUIRED'});
+ const body=JSON.parse(event.body||'{}');const org=String(body.organization_id||'').trim(),projectId=String(body.project_id||'').trim();if(!org||!projectId)return json(400,{error:'ORGANIZATION_AND_PROJECT_REQUIRED'});
+ const allowed=Array.isArray(user.organization_ids)?user.organization_ids.includes(org):user.organization_id===org;if(!allowed)return json(403,{error:'ORGANIZATION_ACCESS_DENIED'});
+ const memberships=await supabaseRequest(`organization_members?organization_id=eq.${encodeURIComponent(org)}&user_id=eq.${encodeURIComponent(user.id||'')}&select=role&limit=1`);const role=String(memberships?.[0]?.role||user.role||'VIEWER').toUpperCase();if(!ROLES.has(role))return json(403,{error:'DELIVERY_ROLE_REQUIRED'});
+ const stop=(await supabaseRequest(`system_controls?organization_id=eq.${encodeURIComponent(org)}&select=emergency_stop&limit=1`))?.[0];if(stop?.emergency_stop)return json(200,{skipped:true,reason:'EMERGENCY_STOP'});
+ const project=(await supabaseRequest(`projects?id=eq.${encodeURIComponent(projectId)}&organization_id=eq.${encodeURIComponent(org)}&select=id,name,status,delivery_service&limit=1`))?.[0];if(!project)return json(404,{error:'PROJECT_NOT_FOUND'});
+ const key=String(project.delivery_service||'').toUpperCase().replace(/[^A-Z_]/g,'');const templates=SERVICE_TASKS[key]||['Kickoff and requirements','Strategy/delivery work','Production','QA review','Client approval'];
+ const start=body.start_date?new Date(body.start_date):new Date();const dueDays=Number(body.default_due_days||7);const created=[];
+ for(let i=0;i<templates.length;i++){const due=new Date(start);due.setDate(due.getDate()+dueDays*(i+1));const rows=await supabaseRequest('tasks',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({organization_id:org,project_id:projectId,title:templates[i],status:'PENDING',priority:i===0?'HIGH':'MEDIUM',due_date:due.toISOString().slice(0,10),qa_status:'PENDING',client_approval_status:templates[i].toLowerCase().includes('approval')?'PENDING':'NOT_REQUIRED',dependencies:i?[created[i-1]?.id].filter(Boolean):[],created_by:user.id||null,created_at:new Date().toISOString()})});if(rows?.[0])created.push(rows[0]);}
+ await supabaseRequest(`projects?id=eq.${encodeURIComponent(projectId)}&organization_id=eq.${encodeURIComponent(org)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:'IN_PROGRESS',updated_at:new Date().toISOString()})});
+ await supabaseRequest('events',{method:'POST',body:JSON.stringify({organization_id:org,event_type:'DELIVERY_TASKS_GENERATED',source:'delivery-task-automation-engine',payload:{project_id:projectId,service:key,task_ids:created.map(t=>t.id)}})});
+ return json(200,{ok:true,project_id:projectId,service:key,tasks:created,next_step:'ASSIGN_TASK_OWNERS'});
+}
+exports.handler=async event=>{if(event.httpMethod!=='POST')return json(405,{error:'METHOD_NOT_ALLOWED'});try{return await run(event);}catch(e){console.error(e);return json(500,{error:'DELIVERY_TASK_AUTOMATION_FAILED'});}};
+module.exports.run=run;
