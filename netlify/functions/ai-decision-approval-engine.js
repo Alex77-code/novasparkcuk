@@ -9,7 +9,7 @@ async function run(event){
  const body=JSON.parse(event.body||'{}');const action=String(body.action||'').toUpperCase();
  if(!RULES[action])return json(400,{error:'UNSUPPORTED_ACTION'});
  const rule=RULES[action];
- return json(200,{ok:true,decision:{action,risk:rule.risk,approval_required:rule.approval,execution:'APPROVAL_REQUIRED'===rule.approval?'HOLD':'ALLOWED'},policy:{credentials_server_side_only:true,external_publish_requires_approval:true,destructive_actions_require_approval:true},requested_by:user.id||null});
+ return json(200,{ok:true,decision:{action,risk:rule.risk,approval_required:rule.approval,execution:rule.approval?'HOLD':'ALLOWED'},policy:{credentials_server_side_only:true,external_publish_requires_approval:true,destructive_actions_require_approval:true},requested_by:user.id||null});
 }
 exports.handler=async event=>{if(event.httpMethod!=='POST')return json(405,{error:'METHOD_NOT_ALLOWED'});try{return await run(event);}catch(e){console.error(e);return json(500,{error:'AI_DECISION_ENGINE_FAILED'});}};
 module.exports.run=run;
