@@ -1,4 +1,20 @@
+const crypto = require('node:crypto');
 const { json, supabaseRequest, verifyUser } = require('./_nova');
+
+function safeEqual(a, b) {
+ if (!a || !b) return false;
+ const aa = Buffer.from(String(a));
+ const bb = Buffer.from(String(b));
+ return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
+}
+
+async function verifyCronOrUser(event) {
+ const auth = event.headers?.authorization || event.headers?.Authorization || '';
+ const cronSecret = process.env.NOVA_CRON_SECRET;
+ if (cronSecret && auth.startsWith('Bearer ') && safeEqual(auth.slice(7), cronSecret)) return { type: 'cron' };
+ const user = await verifyUser(auth);
+ return user ? { type: 'user', user } : null;
+}
 
 async function runAutonomousLoop(){
  const org=(await supabaseRequest('organizations?select=id,name&name=eq.NovaSpark%20Creative&limit=1'))?.[0];
@@ -20,5 +36,16 @@ async function runAutonomousLoop(){
  await supabaseRequest('audit_logs',{method:'POST',body:JSON.stringify({organization_id:org.id,actor_type:'NOVA_CEO',action:'AUTONOMOUS_LOOP_RUN',resource_type:'ceo_goals',metadata:{active_goals:(goals||[]).length,actions:actions.length,recent_events:(events||[]).length}})});
  return {ok:true,active_goals:(goals||[]).length,actions,recent_events:(events||[]).length};
 }
-exports.handler=async event=>{if(event.httpMethod!=='POST')return json(405,{error:'METHOD_NOT_ALLOWED'});try{const user=await verifyUser(event.headers.authorization||event.headers.Authorization);if(!user)return json(401,{error:'AUTHENTICATION_REQUIRED'});return json(200,await runAutonomousLoop());}catch(e){console.error(e);return json(500,{error:'AUTONOMOUS_LOOP_FAILED',message:e.message});}};
+
+exports.handler=async event=>{
+ if(event.httpMethod!=='POST') return json(405,{error:'METHOD_NOT_ALLOWED'});
+ try{
+   const auth=await verifyCronOrUser(event);
+   if(!auth) return json(401,{error:'AUTHENTICATION_REQUIRED'});
+   return json(200,await runAutonomousLoop());
+ }catch(e){
+   console.error(e);
+   return json(500,{error:'AUTONOMOUS_LOOP_FAILED',message:e.message});
+ }
+};
 module.exports.runAutonomousLoop=runAutonomousLoop;
