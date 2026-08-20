@@ -1,0 +1,29 @@
+name: Nova OS CI
+
+on:
+  push:
+    branches: ["main", "nova-ai-bos-build"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check Netlify functions
+        run: |
+          set -e
+          for file in netlify/functions/*.js; do
+            node --check "$file"
+          done
+      - name: Verify Nova OS assets
+        run: |
+          test -f nova-os/index.html
+          test -f nova-os/app.js
+          test -f nova-os/supabase/migrations/006_autonomous_runtime.sql
+          test -f netlify/functions/nova-worker.js

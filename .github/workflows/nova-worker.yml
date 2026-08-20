@@ -1,0 +1,24 @@
+name: Nova Autonomous Worker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  run-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Nova worker
+        env:
+          NOVA_WORKER_URL: ${{ secrets.NOVA_WORKER_URL }}
+          NOVA_WORKER_SECRET: ${{ secrets.NOVA_WORKER_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$NOVA_WORKER_URL"
+          test -n "$NOVA_WORKER_SECRET"
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "x-nova-worker-secret: $NOVA_WORKER_SECRET" \
+            -H "content-type: application/json" \
+            "$NOVA_WORKER_URL/.netlify/functions/nova-worker"
