@@ -3,8 +3,6 @@ const { json, required, supabaseRequest } = require('./_nova');
 const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.6-luna';
 
 function authWorker(event) {
-  // Scheduled/internal invocation is only accepted when Netlify supplies no HTTP method.
-  // HTTP callers must present the same protected cron secret used by the autonomous loop.
   if (!event.httpMethod) return Boolean(process.env.NOVA_CRON_SECRET || process.env.NETLIFY);
   const configured = process.env.NOVA_WORKER_SECRET || process.env.NOVA_CRON_SECRET;
   if (!configured) return false;
@@ -76,16 +74,14 @@ exports.handler = async (event) => {
     if (controls?.emergency_stop) return json(423, { ok: false, status: 'EMERGENCY_STOP' });
     if (controls && controls.automation_enabled === false) return json(423, { ok: false, status: 'AUTOMATION_PAUSED' });
 
-    const [tasks, agents, goals, leads, opportunities, campaigns] = await Promise.all([
+    const [tasks, agents, goals, leads] = await Promise.all([
       supabaseRequest(`tasks?organization_id=eq.${org.id}&status=eq.PLANNED&approval_required=eq.false&risk=eq.LOW&order=priority.desc,created_at.asc&limit=5`),
       supabaseRequest(`agents?organization_id=eq.${org.id}&select=id,key,name,role,status,permissions,tools,metrics&order=name.asc`),
       supabaseRequest(`goals?organization_id=eq.${org.id}&status=eq.ACTIVE&select=id,title,objective,target_value,target_currency,forecast&order=created_at.desc&limit=10`),
-      supabaseRequest(`leads?organization_id=eq.${org.id}&select=id,status,score,source&order=created_at.desc&limit=50`),
-      supabaseRequest(`opportunities?organization_id=eq.${org.id}&select=id,stage,value,currency,probability,expected_close&order=created_at.desc&limit=50`),
-      supabaseRequest(`campaigns?organization_id=eq.${org.id}&select=id,name,channel,status,budget,objective&order=created_at.desc&limit=20`)
+      supabaseRequest(`leads?organization_id=eq.${org.id}&select=id,status,score,source&order=created_at.desc&limit=50`)
     ]);
 
-    const context = { goals, leads, opportunities, campaigns };
+    const context = { goals, leads };
     const processed = [];
     for (const task of tasks || []) {
       const claimed = await claimTask(task);
