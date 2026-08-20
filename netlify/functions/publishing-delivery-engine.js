@@ -1,6 +1,6 @@
 const { json, supabaseRequest, verifyUser } = require('./_nova');
 
-const CHANNELS=new Set(['CLIENT_DELIVERY','WEBSITE_PUBLISH','SOCIAL_PUBLISH','EMAIL_SEND','AD_DEPLOY']);
+const CHANNELS=new Set(['CLIENT_DELIVERY','WEBSITE_PUBLISH','SOCIAL_PUBLISH','EMAIL_SEND','AD_DEPLOY','REPORT_DELIVERY']);
 async function run(event){
  const user=await verifyUser(event.headers.authorization||event.headers.Authorization);if(!user)return json(401,{error:'AUTHENTICATION_REQUIRED'});
  const body=JSON.parse(event.body||'{}');const org=String(body.organization_id||'').trim(),taskId=String(body.task_id||'').trim(),channel=String(body.channel||'CLIENT_DELIVERY').toUpperCase();
