@@ -1,7 +1,7 @@
-const { json, required, supabaseRequest, verifyUser } = require('./_nova');
+const { json, supabaseRequest, verifyUser } = require('./_nova');
 
 const ROLES = new Set(['OWNER','ADMIN','MANAGER']);
-const MODEL = process.env.NOVA_AI_MODEL || 'gpt-5.6-luna';
+const MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
 
 async function run(event) {
   const user = await verifyUser(event.headers?.authorization || event.headers?.Authorization);
@@ -38,25 +38,40 @@ async function run(event) {
   };
 
   const system = `You are NOVA CEO, the executive AI for NovaSpark Creative Ltd. Give concise, commercially useful decisions based only on the supplied company state. Never invent customers, revenue, leads, campaign performance, payments, integrations, or completed actions. Distinguish facts from recommendations. You may recommend low-risk internal work. External communication, ad spend, payments, contracts, publishing, account changes, or irreversible actions require owner approval. If data is missing, say so. Return plain text with: Executive Summary, What Matters Now, Recommended Actions, Risks/Approvals. Current model: ${MODEL}.`;
-  const prompt = `${system}\n\nCOMPANY STATE:\n${JSON.stringify(context)}\n\nOWNER REQUEST:\n${message}`;
-  const base = (process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/$/, '');
-  const response = await fetch(`${base}/v1/responses`, {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${required('OPENAI_API_KEY')}` },
-    body: JSON.stringify({ model: MODEL, input: prompt })
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://novasparkcreative.com',
+      'X-Title': process.env.OPENROUTER_SITE_NAME || 'NovaSpark Creative Ltd'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: `COMPANY STATE:\n${JSON.stringify(context)}\n\nOWNER REQUEST:\n${message}` }
+      ],
+      temperature: 0.2
+    })
   });
   const text = await response.text();
-  if (!response.ok) throw new Error(`OpenAI ${response.status}: ${text}`);
+  if (!response.ok) throw new Error(`OpenRouter ${response.status}: ${text}`);
   const raw = JSON.parse(text);
-  const answer = raw.output_text || raw.output?.flatMap(x => x.content || []).map(x => x.text || '').join('') || 'No executive response returned.';
+  const answer = raw.choices?.[0]?.message?.content || 'No executive response returned.';
 
-  await supabaseRequest('events', { method: 'POST', body: JSON.stringify({ organization_id: org, event_type: 'AI_CEO_CHAT', source: 'ai-ceo-chat', payload: { user_id: user.id, message_length: message.length } }) });
-  return json(200, { ok: true, answer, context: { controls: context.controls, counts: { goals: goals.length, tasks: tasks.length, leads: leads.length, opportunities: opportunities.length, campaigns: campaigns.length, clients: clients.length } }, external_actions: false });
+  await supabaseRequest('events', { method: 'POST', body: JSON.stringify({ organization_id: org, event_type: 'AI_CEO_CHAT', source: 'ai-ceo-chat', payload: { user_id: user.id, message_length: message.length, provider: 'openrouter', model: MODEL } }) });
+  return json(200, { ok: true, answer, model: MODEL, provider: 'openrouter', context: { controls: context.controls, counts: { goals: goals.length, tasks: tasks.length, leads: leads.length, opportunities: opportunities.length, campaigns: campaigns.length, clients: clients.length } }, external_actions: false });
 }
 
 exports.handler = async event => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'METHOD_NOT_ALLOWED' });
-  try { return await run(event); }
-  catch (e) { console.error(e); return json(500, { error: 'AI_CEO_CHAT_FAILED', message: e.message }); }
+  try {
+    if (!process.env.OPENROUTER_API_KEY) return json(503, { error: 'OPENROUTER_API_KEY_NOT_CONFIGURED', message: 'Set OPENROUTER_API_KEY in the server environment.' });
+    return await run(event);
+  } catch (e) {
+    console.error(e);
+    return json(500, { error: 'AI_CEO_CHAT_FAILED', message: e.message });
+  }
 };
 module.exports.run = run;
