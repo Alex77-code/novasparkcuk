@@ -11,12 +11,11 @@ jobs:
     steps:
       - name: Trigger NovaSpark autonomous loop
         env:
-          NOVA_LOOP_URL: ${{ secrets.NOVA_AUTONOMOUS_LOOP_URL }}
+          NOVA_LOOP_URL: https://novasparkcuk.netlify.app/.netlify/functions/autonomous-loop
           NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
           NOVA_ORGANIZATION_ID: ${{ secrets.NOVA_ORGANIZATION_ID }}
         run: |
           set -euo pipefail
-          test -n "$NOVA_LOOP_URL"
           test -n "$NOVA_CRON_SECRET"
           test -n "$NOVA_ORGANIZATION_ID"
           curl --fail-with-body --retry 2 --connect-timeout 10 --max-time 60 \
