@@ -9,6 +9,7 @@
   node_bundler = "esbuild"
 
 # Production autonomous control plane. Netlify Scheduled Functions run in UTC.
+# NovaSpark AI-BOS production deployment trigger.
 [functions.autonomous-loop]
   schedule = "*/15 * * * *"
 
