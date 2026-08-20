@@ -1,0 +1,35 @@
+name: NovaSpark Autonomous Loop
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+concurrency:
+  group: nova-autonomous-loop
+  cancel-in-progress: false
+
+jobs:
+  run-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger production autonomous loop
+        env:
+          NOVA_CRON_SECRET: ${{ secrets.NOVA_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          URL="https://novasparkcuk.netlify.app/.netlify/functions/autonomous-loop"
+          code=$(curl -sS -o /tmp/nova-response.json -w '%{http_code}' \
+            -X POST \
+            -H "Authorization: Bearer ${NOVA_CRON_SECRET}" \
+            -H 'Content-Type: application/json' \
+            --data '{}' \
+            --max-time 90 \
+            "$URL")
+          cat /tmp/nova-response.json
+          echo
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "Autonomous loop failed with HTTP $code"
+            exit 1
+          fi
