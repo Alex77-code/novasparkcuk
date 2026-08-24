@@ -1,2 +1,4 @@
+/api/meta/webhook    /.netlify/functions/meta-webhook   200
+/api/meta/callback   /.netlify/functions/meta-callback  200
 /nova-os/*    /nova-os/index.html   200
 /*    /index.html   200
